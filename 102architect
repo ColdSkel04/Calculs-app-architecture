@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+
+import sys
+import math
+
+def translation(i, j, x, y, m3, m6):
+   print(f"Translation along vector ({i:.0f}, {j:.0f})")
+   x += i
+   y += j
+   m3 += i
+   m6 += j
+   return x, y, m3, m6
+
+def scaling(m, n, x, y, m1, m2, m3, m4, m5, m6):
+   print(f"Scaling by factors {m:.0f} and {n:.0f}")
+   x *= m
+   y *= n
+   m1 *= m
+   m2 *= m
+   m3 *= m
+   m4 *= n
+   m5 *= n
+   m6 *= n
+   return x, y, m1, m2, m3, m4, m5, m6
+
+def rotation(d, x, y, m1, m2, m3, m4, m5, m6):
+   r = math.radians(d)
+   og_x = x
+
+   print(f"Rotation by a {d:.0f} degree angle")
+   x = x * math.cos(r) - y * math.sin(r)
+   y = og_x * math.sin(r) + y * math.cos(r)
+   nm1 = m1 * math.cos(r) - m4 * math.sin(r)
+   nm2 = m2 * math.cos(r) - m5 * math.sin(r)
+   nm3 = m3 * math.cos(r) - m6 * math.sin(r)
+   nm4 = m1 * math.sin(r) + m4 * math.cos(r)
+   nm5 = m2 * math.sin(r) + m5 * math.cos(r)
+   nm6 = m3 * math.sin(r) + m6 * math.cos(r)
+   return x, y, nm1, nm2, nm3, nm4, nm5, nm6
+
+def reflection(d, x, y, m1, m2, m3, m4, m5, m6):
+   theta = math.radians(d)
+   og_x = x
+
+   print(f"Reflection over an axis with an inclination angle of {d:.0f} degrees")
+   cos = math.cos(2 * theta)
+   sin = math.sin(2 * theta)
+   x = x * cos + y * sin
+   y = og_x * sin - y * cos
+   nm1 = m1 * cos + m4 * sin
+   nm2 = m2 * cos + m5 * sin
+   nm3 = m3 * cos + m6 * sin
+   nm4 = m1 * sin - m4 * cos
+   nm5 = m2 * sin - m5 * cos
+   nm6 = m3 * sin - m6 * cos
+   return x, y, nm1, nm2, nm3, nm4, nm5, nm6
+
+def architect():
+   av = (sys.argv)
+   ac = len(sys.argv)
+   i = 3
+   m1 = 1
+   m2 = 0
+   m3 = 0
+   m4 = 0
+   m5 = 1
+   m6 = 0
+
+   if ac == 2 and av[1] == "-h":
+      print("USAGE\n    ./102architect x y transfo1 arg11 [arg12] [transfo2 arg21 [arg22]] ...\n\n\nDESCRIPTION\n    x   abscissa of the original point\n    y   ordinate of the original point\n    transfo arg1 [arg2]\n    -t i j translation along vector (i, j)\n    -z m n scaling by factors m (x-axis) and n (y-axis)\n    -r d rotation centered in O by a d degree angle\n    -s d reflection over the axis passing through O with an inclination\n         angle of d degrees")
+      return 0
+   x = float(av[1])
+   y = float(av[2])
+   og_x = x
+   og_y = y
+   while i < ac:
+      if av[i] == "-t":
+         x, y, m3, m6 = translation(float(av[i + 1]), float(av[i + 2]), x, y, m3, m6)
+         i += 3
+         continue
+      if av[i] == "-z":
+         x, y, m1, m2, m3, m4, m5, m6 = scaling(float(av[i + 1]), float(av[i + 2]), x, y, m1, m2, m3, m4, m5, m6)
+         i += 3
+         continue
+      if av[i] == "-r":
+         x, y, m1, m2, m3, m4, m5, m6 = rotation(float(av[i + 1]), x, y, m1, m2, m3, m4, m5, m6)
+         i += 2
+         continue
+      if av[i] == "-s":
+         x, y, m1, m2, m3, m4, m5, m6 = reflection(float(av[i + 1]), x, y, m1, m2, m3, m4, m5, m6)
+         i += 2
+         continue
+      if av[i] not in ["-t", "-z", "-r", "-s"]:
+         return 84
+   if (m1 < 0):
+      print(f"{m1:.2f}   ", end = "")
+   else:
+      print(f"{m1:.2f}    ", end = "")
+   if (m2 < 0):
+      print(f"{m2:.2f}   ", end = "")
+   else:
+      print(f"{m2:.2f}    ", end = "")
+   if (m3 < 0):
+      print(f"{m3:.2f}")
+   else:
+      print(f"{m3:.2f}")
+   if (m4 < 0):
+      print(f"{m4:.2f}   ", end = "")
+   else:
+      print(f"{m4:.2f}    ", end = "")
+   if (m5 < 0):
+      print(f"{m5:.2f}   ", end = "")
+   else:
+      print(f"{m5:.2f}    ", end = "")
+   if (m6 < 0):
+      print(f"{m6:.2f}")
+   else:
+      print(f"{m6:.2f}")
+   print("0.00    0.00    1.00")
+   print(f"({og_x:.2f}, {og_y:.2f}) => ({x:.2f}, {y:.2f})")
+          
+architect()
